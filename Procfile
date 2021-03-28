@@ -1,2 +1,2 @@
-pip install -r requirements.txt​
+npm upgrade youtube-dl
 web: gunicorn app:app --timeout 3000 --workers 1 --preload --log-file -
