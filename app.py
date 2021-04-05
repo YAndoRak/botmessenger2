@@ -84,9 +84,9 @@ def receive_message():
 					recipient_id = message['sender']['id']
 					if message['message'].get('text'):
 						receive_message = message['message'].get('text').split()
-						if (receive_message[0] == "search_google"):
+						if (receive_message[0] == "gg"):
 							if len(receive_message) < 2:
-								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être search_google + mot_recherché')
+								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être gg + mot_recherché')
 							else:
 								try:
 									response_query = ' '.join(map(str, receive_message[1:]))
