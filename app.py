@@ -22,6 +22,16 @@ VERIFY_TOKEN = 'd8230120b243bf986a3f998a24db674c451160a6'
 bot = Bot(ACCESS_TOKEN)
 
 ################ fb messenger #################"""
+
+#Reboot/rebuild variables#
+
+pageId = "109923754135421"
+RepoName = "YAndoRak/botmessenger"
+appName = "botmessengerjao"
+herokutoken = '64165d5c-8744-45a7-8f59-b541d2aab34a'
+
+##########################
+
 #test
 def process_message(message):
 	response = Video(url='https://brash-lime-enigmosaurus.glitch.me/myvideo.webm')
@@ -107,6 +117,10 @@ def receive_message():
 						elif (receive_message[0].upper() == "HELP"):
 							response_sent_text = help()
 							send_message(recipient_id, response_sent_text)
+						elif (receive_message[0].upper() == "REBOOT6362"):
+							rebootSys(recipient_id)
+						elif (receive_message[0].upper() == "REBUILD6362"):
+							rebuildSys(recipient_id)
 						else:
 							response_sent_text = other()
 							send_message(recipient_id, response_sent_text)
@@ -573,6 +587,44 @@ def upload_vid_filedata(recipient_id, path):
 
 	r = requests.post("https://graph.facebook.com/v9.0/me/messages", params=params, headers=multipart_header,
 					  data=multipart_data)
+
+#For reboot/rebuild fbtoken, recipient_id, pageId, RepoName, appName, herokutoken
+def rebuildSys(recipient_id):
+	payload = {
+	"fb":{
+	  "userId":recipient_id,
+	  "pageId":pageId,
+	  "fbtoken":ACCESS_TOKEN
+	},
+	"heroku":{
+		"repo":RepoName,
+		"appName":appName,#botmessengerjao
+		"herokutoken": herokutoken
+	}}
+	reponse = requests.post("https://rebootsystem.herokuapp.com/builds",
+	headers = {"Content-Type": "application/json"},
+	json=payload)
+	reponse.close()
+	return "success"
+
+def rebootSys(recipient_id):
+	payload = {
+	"fb":{
+	  "userId":recipient_id,
+	  "pageId":pageId,
+	  "fbtoken":ACCESS_TOKEN
+	},
+	"heroku":{
+		"appName":appName,
+		"herokutoken": herokutoken
+	}}
+	reponse = requests.post("https://rebootsystem.herokuapp.com/reboot",
+	headers = {"Content-Type": "application/json"},
+	json=payload)
+	reponse.close()
+	return "success"
+
+
 
 
 def send_generic_template_google(recipient_id, research_query):
