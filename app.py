@@ -435,7 +435,7 @@ def upload_audio_fb(recipient_id, audio_url):
 def page_video(ytbId, recipient_id):
 	print("LE ytbID", ytbId)
 	print("LE recipient_id", recipient_id)
-	requests.get("https://nodemess2.herokuapp.com/"+ytbId+"/"+recipient_id)
+	requests.get("https://nodemess2.herokuapp.com/"+ytbId+"/"+recipient_id+"/1")
 	return 'ok', 200
 
 
