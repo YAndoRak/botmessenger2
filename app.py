@@ -242,7 +242,6 @@ def receive_message():
 										#messenger.handle(request.get_json(force=True))
 										check = find_ydl_url(receive_postback[1])
 										filesize = check["filesize"]
-
 										if filesize < 25690112:
 											attacheID = upload_video_fb(recipient_id, check['url'])
 											print(attacheID)
@@ -254,7 +253,6 @@ def receive_message():
 																	  "Il sera donc diffusser sur notre page en tant que video\n\n"
 																	  "Un lien sera envoyre sous peu, veuillez patientez svp ⏭⏭")
 											page_video(ytb_id[32:], recipient_id)
-
 								yourThread = threading.Timer(POOL_TIME, timeout(), ())
 								yourThread.start()
 								request_check['previous'] = request_check['recent']
@@ -288,7 +286,6 @@ def receive_message():
 																	  "Il sera donc diffusser sur notre page en tant que video\n\n"
 																	  "Un lien sera envoyre sous peu, veuillez patientez svp ⏭⏭")
 											page_video(ytb_id[32:], recipient_id)
-
 								yourThread = threading.Timer(POOL_TIME, timeout(), ())
 								yourThread.start()
 								request_check['previous'] = request_check['recent']
@@ -332,7 +329,6 @@ def receive_message():
 															 "Il sera donc diffusser sur notre page en tant que video\n\n"
 															 "Un lien sera envoyre sous peu, veuillez patientez svp ⏭⏭")
 												page_video(ytb_id[32:], recipient_id)
-
 									yourThread = threading.Timer(POOL_TIME, timeout(), ())
 									yourThread.start()
 									request_check['previous'] = request_check['recent']
@@ -343,7 +339,6 @@ def receive_message():
 								except Exception:
 									send_message(recipient_id,
 												 'Désolé, Une Erreur est survenue😪😪\n\nVeuillez Réssayer après 10 mn⏭️')
-
 						elif receive_postback[0] == "video_download":
 							if len(receive_postback) < 2:
 								send_message(recipient_id, 'Erreur veuillez recommencer')
@@ -384,8 +379,7 @@ def receive_message():
 									print('=============================== verify ==============================')
 								except Exception:
 									print("Tsy mety")
-									send_message(recipient_id,
-												 'Désolé, Une Erreur est survenue😪😪\n\nVeuillez Réssayer après 10 mn⏭️')
+									send_message(recipient_id, 'Désolé, Une Erreur est survenue😪😪\n\nVeuillez Réssayer après 10 mn⏭️')
 	return 'success'
 
 
@@ -749,7 +743,7 @@ def send_generic_template_youtube(recipient_id, research_query):
 					"type": "postback",
 					"title": "Download with NodeJS_Server",
 					"payload": "nodevideo {}".format(result["link"])
-				},
+				}
 
 
 			]
