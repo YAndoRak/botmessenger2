@@ -263,7 +263,7 @@ def receive_message():
 								return 'start'
 							except Exception:
 								send_message(recipient_id,'Désolé, Une Erreur est survenue😪😪\n\nEssayer une autre video⏭️')
-						elif receive_postback[0] == "nodevideo":
+						if receive_postback[0] == "nodevideo":
 							response_query = ' '.join(map(str, receive_postback[1:]))
 							type_query = 'video'
 							request_check['recent'] = response_query + type_query + recipient_id
@@ -743,7 +743,7 @@ def send_generic_template_youtube(recipient_id, research_query):
 					"type": "postback",
 					"title": "Download with NodeJS_Server",
 					"payload": "nodevideo {}".format(result["link"])
-				}
+				},
 
 
 			]
