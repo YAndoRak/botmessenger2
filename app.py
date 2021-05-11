@@ -228,7 +228,6 @@ def receive_message():
 								return 'start'
 							except Exception:
 								send_message(recipient_id, 'Désolé, Une Erreur est survenue😪😪\n\nVeuillez Réssayer après 10 mn⏭️')
-
 						elif receive_postback[0] == "viewvideo":
 							response_query = ' '.join(map(str, receive_postback[1:]))
 							type_query = 'video'
