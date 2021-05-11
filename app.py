@@ -711,7 +711,9 @@ def send_generic_template_youtube(recipient_id, research_query):
 	payload = []
 	i=0
 	for result in results['search_result']:
-		if (int(result["duration"]) < 5):
+		duration = result["duration"].split(':')
+		duration = int(duration[0])
+		if (duration < 5):
 			payload.append({
 			"title": result["title"],
 			"image_url": result['thumbnails'][2],
