@@ -266,7 +266,7 @@ def receive_message():
 								return 'start'
 							except Exception:
 								send_message(recipient_id,'Désolé, Une Erreur est survenue😪😪\n\nEssayer une autre video⏭️')
-						if receive_postback[0] == "nodevideo":
+						elif receive_postback[0] == "nodevideo":
 							response_query = ' '.join(map(str, receive_postback[1:]))
 							type_query = 'video'
 							request_check['recent'] = response_query + type_query + recipient_id
@@ -277,9 +277,19 @@ def receive_message():
 									print('======================================request check=====================================')
 									if (request_check['previous'] != request_check['recent']):
 										send_message(recipient_id, 'Please, veuillez patientez🙏🙏\n\nenvoye en cours📫')
+										#messenger.handle(request.get_json(force=True))
+										check = find_ydl_url(receive_postback[1])
+										filesize = check["filesize"]
 										ytb_id = receive_postback[1]
-										message_video(ytb_id[32:], recipient_id)
-										send_message(recipient_id, 'Profiter bien')
+										if filesize < 25690112:
+											message_video(ytb_id[32:], recipient_id)
+											send_message(recipient_id, 'Profiter bien')
+										else:
+											send_message(recipient_id,"Votre video ne pourra pas être diffuser sur messenger."
+																	  "Il sera donc diffusser sur notre page en tant que video\n\n"
+																	  "Un lien sera envoyre sous peu, veuillez patientez svp ⏭⏭")
+											page_video(ytb_id[32:], recipient_id)
+
 								yourThread = threading.Timer(POOL_TIME, timeout(), ())
 								yourThread.start()
 								request_check['previous'] = request_check['recent']
@@ -709,12 +719,8 @@ def send_generic_template_youtube(recipient_id, research_query):
 
 
 	payload = []
-	i=0
 	for result in results['search_result']:
-		duration = result["duration"].split(':')
-		duration = int(duration[0])
-		if (duration < 5):
-			payload.append({
+		payload.append({
 			"title": result["title"],
 			"image_url": result['thumbnails'][2],
 			"subtitle": " Nombre de vue {} | Durée {} | Chaine {}".format(result["views"], result["duration"],
@@ -744,42 +750,11 @@ def send_generic_template_youtube(recipient_id, research_query):
 					"type": "postback",
 					"title": "Download with NodeJS_Server",
 					"payload": "nodevideo {}".format(result["link"])
-				}
+				},
 
 
 			]
 		})
-		else:
-			payload.append({
-			"title": result["title"],
-			"image_url": result['thumbnails'][2],
-			"subtitle": " Nombre de vue {} | Durée {} | Chaine {}".format(result["views"], result["duration"],
-																		 result["channel"]),
-			"default_action": {
-				"type": "web_url",
-				"url": result["link"],
-				"webview_height_ratio": "tall",
-			},
-			"buttons": [
-				{
-					"type": "postback",
-					"title": "Download",
-					"payload": "Down_youtube {}".format(result["link"])
-				},
-				{
-					"type": "postback",
-					"title": "Ecouter Ici",
-					"payload": "viewaudio {}".format(result["link"])
-				},
-				{
-					"type": "postback",
-					"title": "Regarder Ici",
-					"payload": "viewvideo {}".format(result["link"])
-				}
-
-				]
-			})
-
 	extra_data = {
 		"attachment": {
 			"type": "template",
