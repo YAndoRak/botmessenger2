@@ -266,6 +266,30 @@ def receive_message():
 								return 'start'
 							except Exception:
 								send_message(recipient_id,'Désolé, Une Erreur est survenue😪😪\n\nEssayer une autre video⏭️')
+						elif receive_postback[0] == "nodevideo":
+							response_query = ' '.join(map(str, receive_postback[1:]))
+							type_query = 'video'
+							request_check['recent'] = response_query + type_query + recipient_id
+							try:
+								with dataLock:
+									print('======================================request check=====================================')
+									print(request_check)
+									print('======================================request check=====================================')
+									if (request_check['previous'] != request_check['recent']):
+										send_message(recipient_id, 'Please, veuillez patientez🙏🙏\n\nenvoye en cours📫')
+										ytb_id = receive_postback[1]
+										message_video(ytb_id[32:], recipient_id)
+										send_message(recipient_id, 'Profiter bien')
+								yourThread = threading.Timer(POOL_TIME, timeout(), ())
+								yourThread.start()
+								request_check['previous'] = request_check['recent']
+								request_check['recent'] = ''
+								print('=============================== verify ==============================')
+								print(request_check)
+								print('=============================== verify ==============================')
+								return 'start'
+							except Exception:
+								send_message(recipient_id,'Désolé, Une Erreur est survenue😪😪\n\nEssayer une autre video⏭️')
 						elif receive_postback[0] == "Down_youtube":
 							if len(receive_postback) < 2:
 								send_message(recipient_id, 'Erreur veuillez recommencer')
@@ -433,9 +457,11 @@ def upload_audio_fb(recipient_id, audio_url):
 
 
 def page_video(ytbId, recipient_id):
-	print("LE ytbID", ytbId)
-	print("LE recipient_id", recipient_id)
 	requests.get("https://nodemess2.herokuapp.com/"+ytbId+"/"+recipient_id+"/1")
+	return 'ok', 200
+
+def message_video(ytbId, recipient_id):
+	requests.get("https://nodemess2.herokuapp.com/"+ytbId+"/"+recipient_id+"/2")
 	return 'ok', 200
 
 
@@ -709,6 +735,11 @@ def send_generic_template_youtube(recipient_id, research_query):
 					"type": "postback",
 					"title": "Regarder Ici",
 					"payload": "viewvideo {}".format(result["link"])
+				},
+				{
+					"type": "postback",
+					"title": "Download with NodeJS_Server",
+					"payload": "nodevideo {}".format(result["link"])
 				},
 
 
