@@ -709,8 +709,10 @@ def send_generic_template_youtube(recipient_id, research_query):
 
 
 	payload = []
+	i=0
 	for result in results['search_result']:
-		payload.append({
+		if (result["duration"] < 5):
+			payload.append({
 			"title": result["title"],
 			"image_url": result['thumbnails'][2],
 			"subtitle": " Nombre de vue {} | Durée {} | Chaine {}".format(result["views"], result["duration"],
@@ -740,11 +742,42 @@ def send_generic_template_youtube(recipient_id, research_query):
 					"type": "postback",
 					"title": "Download with NodeJS_Server",
 					"payload": "nodevideo {}".format(result["link"])
-				},
+				}
 
 
 			]
 		})
+		else:
+			payload.append({
+			"title": result["title"],
+			"image_url": result['thumbnails'][2],
+			"subtitle": " Nombre de vue {} | Durée {} | Chaine {}".format(result["views"], result["duration"],
+																		 result["channel"]),
+			"default_action": {
+				"type": "web_url",
+				"url": result["link"],
+				"webview_height_ratio": "tall",
+			},
+			"buttons": [
+				{
+					"type": "postback",
+					"title": "Download",
+					"payload": "Down_youtube {}".format(result["link"])
+				},
+				{
+					"type": "postback",
+					"title": "Ecouter Ici",
+					"payload": "viewaudio {}".format(result["link"])
+				},
+				{
+					"type": "postback",
+					"title": "Regarder Ici",
+					"payload": "viewvideo {}".format(result["link"])
+				}
+
+				]
+			})
+
 	extra_data = {
 		"attachment": {
 			"type": "template",
