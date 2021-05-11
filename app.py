@@ -266,7 +266,7 @@ def receive_message():
 								return 'start'
 							except Exception:
 								send_message(recipient_id,'Désolé, Une Erreur est survenue😪😪\n\nEssayer une autre video⏭️')
-						elif receive_postback[0] == "nodevideo":
+						if receive_postback[0] == "nodevideo":
 							response_query = ' '.join(map(str, receive_postback[1:]))
 							type_query = 'video'
 							request_check['recent'] = response_query + type_query + recipient_id
@@ -711,7 +711,7 @@ def send_generic_template_youtube(recipient_id, research_query):
 	payload = []
 	i=0
 	for result in results['search_result']:
-		if (result["duration"] < 5):
+		if (int(result["duration"]) < 5):
 			payload.append({
 			"title": result["title"],
 			"image_url": result['thumbnails'][2],
