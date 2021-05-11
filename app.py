@@ -280,7 +280,7 @@ def receive_message():
 										ytb_id = receive_postback[1]
 										if filesize < 25690112:
 											message_video(ytb_id[32:], recipient_id)
-											send_message(recipient_id, 'Profiter bien')
+											send_message(recipient_id, 'Veuillez patientez svp ...')
 										else:
 											send_message(recipient_id,"Votre video ne pourra pas être diffuser sur messenger."
 																	  "Il sera donc diffusser sur notre page en tant que video\n\n"
