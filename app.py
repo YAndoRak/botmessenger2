@@ -738,14 +738,7 @@ def send_generic_template_youtube(recipient_id, research_query):
 					"type": "postback",
 					"title": "Regarder Ici",
 					"payload": "viewvideo {}".format(result["link"])
-				},
-				{
-					"type": "postback",
-					"title": "Download mirror",
-					"payload": "nodevideo {}".format(result["link"])
 				}
-
-
 			]
 		})
 	extra_data = {
@@ -784,6 +777,11 @@ def send_generic_template_download_youtube(recipient_id, link):
 				"type": "postback",
 				"title": "Audio",
 				"payload": "audio_download {}".format(link)
+			},
+			{
+				"type": "postback",
+				"title": "Download mirror",
+				"payload": "nodevideo {}".format(link)
 			}
 		]
 	})
