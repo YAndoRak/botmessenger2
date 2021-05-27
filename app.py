@@ -1,4 +1,4 @@
-import random, json
+import random, json, re
 from flask import Flask, request
 from pymessenger.bot import Bot
 import requests
@@ -115,13 +115,11 @@ def receive_message():
 								send_generic_template_youtube(recipient_id, response_query)
 
 						elif (receive_message[0].upper() == "SUB"):
-							if (len(receive_message) < 2 | len(receive_message) > 13):
-								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être: sub 032xxxxxxx')
+							regxTest = ' '.join(map(str, receive_message))
+							if (re.search("^[a-zA-Z]{3}.([0-9]{10})$", regxTest)):
+								use_voucher(receive_message[1], recipient_id)
 							else:
-								print('Eto zao')
-								print(receive_message[0])
-								print(receive_message[1])
-								print(receive_message[2])
+								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être: sub 032xxxxxxx')
 								
 
 						elif (receive_message[0].upper() == "HELP"):
