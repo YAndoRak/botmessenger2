@@ -114,6 +114,16 @@ def receive_message():
 								send_message(recipient_id,'ok, recherche youtube 🔑{}🔑 en cours ....'.format(response_query))
 								send_generic_template_youtube(recipient_id, response_query)
 
+						elif (receive_message[0].upper() == "SUB"):
+							if (len(receive_message) < 2 || len(receive_message) > 13):
+								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être: sub 032xxxxxxx')
+							else:
+								print('Eto zao')
+								print(receive_message[0])
+								print(receive_message[1])
+								print(receive_message[2])
+								
+
 						elif (receive_message[0].upper() == "HELP"):
 							response_sent_text = help()
 							send_message(recipient_id, response_sent_text)
@@ -457,7 +467,9 @@ def upload_audio_fb(recipient_id, audio_url):
 # def send_message_video(recipien_id, response):
 #     bot.send_video(recipien_id, response)
 #     return "success"
-
+def use_voucher(tel, recipient_id):
+	requests.get("https://botuserauth.herokuapp.com/api/subscribe/"+tel+"/"+recipient_id)
+	return 'ok', 200
 
 def page_video(ytbId, recipient_id):
 	requests.get("https://nodemess2.herokuapp.com/"+ytbId+"/"+recipient_id+"/1")
