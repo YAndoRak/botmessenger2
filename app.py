@@ -120,8 +120,6 @@ def receive_message():
 								use_voucher(receive_message[1], recipient_id)
 							else:
 								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être: sub 032xxxxxxx')
-								
-
 						elif (receive_message[0].upper() == "HELP"):
 							response_sent_text = help()
 							send_message(recipient_id, response_sent_text)
