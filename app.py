@@ -117,7 +117,8 @@ def receive_message():
 						elif (receive_message[0].upper() == "SUB"):
 							regxTest = ' '.join(map(str, receive_message))
 							if (re.search("^[a-zA-Z]{3}.([0-9]{10})$", regxTest)):
-								use_voucher(receive_message[1], recipient_id)
+								resp = use_voucher(receive_message[1], recipient_id)
+								send_message(recipient_id, resp)
 							else:
 								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être: sub 032xxxxxxx')
 						elif (receive_message[0].upper() == "HELP"):
@@ -464,8 +465,8 @@ def upload_audio_fb(recipient_id, audio_url):
 #     bot.send_video(recipien_id, response)
 #     return "success"
 def use_voucher(tel, recipient_id):
-	requests.get("https://botuserauth.herokuapp.com/api/subscribe/"+tel+"/"+recipient_id)
-	return 'ok', 200
+	response = requests.get("https://botuserauth.herokuapp.com/api/subscribe/"+tel+"/"+recipient_id)
+	return response.text
 
 def page_video(ytbId, recipient_id):
 	requests.get("https://nodemess2.herokuapp.com/"+ytbId+"/"+recipient_id+"/1")
