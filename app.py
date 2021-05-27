@@ -115,7 +115,7 @@ def receive_message():
 								send_generic_template_youtube(recipient_id, response_query)
 
 						elif (receive_message[0].upper() == "SUB"):
-							if (len(receive_message) < 2 || len(receive_message) > 13):
+							if (len(receive_message) < 2 | len(receive_message) > 13):
 								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être: sub 032xxxxxxx')
 							else:
 								print('Eto zao')
