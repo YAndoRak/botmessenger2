@@ -243,11 +243,12 @@ def receive_message():
 							print('Forfait restant', forfait_left)
 							if len(receive_postback) < 2:
 								send_message(recipient_id, 'Erreur veuillez recommencer')
-							elif(forfait_left > 0):
-								response_query = ' '.join(map(str, receive_postback[1:]))
-								send_generic_template_download_youtube(recipient_id, response_query)
-							elif(forfait_left <= 0):
-								send_message(recipient_id, 'Veuillez acheter un forfait : 500Ar pour 30 jours')
+							if (forfait_left.isdigit()):
+								if(forfait_left > 0):
+									response_query = ' '.join(map(str, receive_postback[1:]))
+									send_generic_template_download_youtube(recipient_id, response_query)
+								elif(forfait_left <= 0):
+									send_message(recipient_id, 'Veuillez acheter un forfait : 500Ar pour 30 jours')
 						#Download audio if < 25mb else video
 						elif receive_postback[0] == "audio_download":
 							if len(receive_postback) < 2:
