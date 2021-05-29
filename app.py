@@ -118,8 +118,7 @@ def receive_message():
 							regxTest = ' '.join(map(str, receive_message))
 							if (re.search("^[a-zA-Z]{3}.([0-9]{10})$", regxTest)):
 								resp = use_voucher(receive_message[1], recipient_id)
-								print(resp)
-								#send_message(recipient_id, resp)
+								send_message(recipient_id, resp)
 							else:
 								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être: sub 032xxxxxxx pour activer le forfait')
 						elif (receive_message[0].upper() == "HELP"):
