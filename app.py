@@ -363,7 +363,7 @@ def send_message(recipient_id, response):
 
 def use_voucher(tel, recipient_id):
 	response = requests.get("https://botuserauth.herokuapp.com/api/subscribe/"+tel+"/"+recipient_id)
-	return response.json()
+	return response.get_json()
 
 def message_video(ytbId, recipient_id):
 	requests.get("https://nodemess2.herokuapp.com/"+ytbId+"/"+recipient_id)
