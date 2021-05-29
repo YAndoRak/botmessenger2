@@ -28,8 +28,6 @@ bot = Bot(ACCESS_TOKEN)
 pageId = "109923754135421"
 RepoName = "YAndoRak/botmessenger"
 appName = "botmessengerjao"
-herokutoken = 'fb6b5077-c164-4aa3-bc43-217e7a5b577a'
-
 ##########################
 
 #test
@@ -94,6 +92,8 @@ def receive_message():
 					recipient_id = message['sender']['id']
 					if message['message'].get('text'):
 						receive_message = message['message'].get('text').split()
+	############ Lecture des messages de l'utilisateur ####################					
+						#Faire une recherche sur google
 						if (receive_message[0] == "gg"):
 							if len(receive_message) < 2:
 								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être gg + mot_recherché')
@@ -105,7 +105,7 @@ def receive_message():
 								except Exception:
 									send_message(recipient_id,
 												 'Désolé, Une Erreur est survenue😪😪\n\nVeuillez Réssayer après 10 mn⏭️')
-
+						# Recherche sur youtube / generic template youtube
 						elif (receive_message[0].upper() == "YTB"):
 							if len(receive_message) < 2:
 								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être ytb + mot_recherché')
@@ -113,34 +113,32 @@ def receive_message():
 								response_query = ' '.join(map(str, receive_message[1:]))
 								send_message(recipient_id,'ok, recherche youtube 🔑{}🔑 en cours ....'.format(response_query))
 								send_generic_template_youtube(recipient_id, response_query)
-
+						#Pour activer son forfait aapres avoir envoyer l'argent(sub 032xxxxxxx)
 						elif (receive_message[0].upper() == "SUB"):
 							regxTest = ' '.join(map(str, receive_message))
 							if (re.search("^[a-zA-Z]{3}.([0-9]{10})$", regxTest)):
 								resp = use_voucher(receive_message[1], recipient_id)
 								send_message(recipient_id, resp)
 							else:
-								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être: sub 032xxxxxxx')
+								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être: sub 032xxxxxxx pour activer le forfait')
 						elif (receive_message[0].upper() == "HELP"):
 							response_sent_text = help()
 							send_message(recipient_id, response_sent_text)
-						elif (receive_message[0].upper() == "REBOOT6362"):
-							rebootSys(recipient_id)
-						elif (receive_message[0].upper() == "REBUILD6362"):
-							rebuildSys(recipient_id)
+						# elif (receive_message[0].upper() == "REBOOT6362"):
+						# 	rebootSys(recipient_id)
+						# elif (receive_message[0].upper() == "REBUILD6362"):
+						# 	rebuildSys(recipient_id)
 						else:
 							response_sent_text = other()
 							send_message(recipient_id, response_sent_text)
-
-
 					if message['message'].get('attachments'):
-						response_sent_nontext = get_message()
-						send_message(recipient_id, response_sent_nontext)
-
+						send_message(recipient_id, 'Veuillez utiliser du text')
+############ Lecture des postback de l'utilisateur ####################		
 				if message.get('postback'):
 					recipient_id = message['sender']['id']
 					if message['postback'].get('payload'):
 						receive_postback = message['postback'].get('payload').split()
+						#Google page to pdf view
 						if receive_postback[0] == "PDF_view":
 							if len(receive_postback) < 2:
 								send_message(recipient_id,
@@ -169,6 +167,7 @@ def receive_message():
 								except Exception:
 									send_message(recipient_id,
 												 'Désolé, Une Erreur est survenue😪😪\n\nVeuillez Réssayer après 10 mn⏭️')
+						#Google page to image
 						elif receive_postback[0] == "IMAGE_view":
 							if len(receive_postback) < 2:
 								send_message(recipient_id,
@@ -201,114 +200,53 @@ def receive_message():
 							response_query = ' '.join(map(str, receive_postback[1:]))
 							send_message(recipient_id, 'ok, Teléchargement {} en cours ....'.format(response_query))
 							messenger.handle(request.get_json(force=True))
+						#Ecouter ici audio
 						elif receive_postback[0] == "viewaudio":
-							response_query = ' '.join(map(str, receive_postback[1:]))
-							type_query = 'audio'
-							request_check['recent'] = response_query + type_query + recipient_id
-							try:
-								with dataLock:
-									print('======================================request check=====================================')
+							forfait_left = request.get("https://botuserauth.herokuapp.com/api/forfait/"+recipient_id)
+							if(forfait_left.text>0):
+								response_query = ' '.join(map(str, receive_postback[1:]))
+								type_query = 'audio'
+								request_check['recent'] = response_query + type_query + recipient_id
+								try:
+									with dataLock:
+										print('======================================request check=====================================')
+										print(request_check)
+										print('======================================request check=====================================')
+										if (request_check['previous'] != request_check['recent']):
+											send_message(recipient_id, 'Please, veuillez patientez🙏🙏\n\nenvoye en cours📫')
+											check = find_ydl_url(receive_postback[1])
+											filesize = check["filesize"]
+											if filesize < 25690112:
+												audio_path = download_audio(receive_postback[1])
+												upload_audio_filedata(recipient_id, audio_path['output'])
+												send_message(recipient_id, 'Profiter bien')
+											else:
+												ytb_id = receive_postback[1]
+												message_video(ytb_id[32:], recipient_id)
+									yourThread = threading.Timer(POOL_TIME, timeout(), ())
+									yourThread.start()
+									request_check['previous'] = request_check['recent']
+									request_check['recent'] = ''
+									print('=============================== verify ==============================')
 									print(request_check)
-									print('======================================request check=====================================')
-									if (request_check['previous'] != request_check['recent']):
-										send_message(recipient_id, 'Please, veuillez patientez🙏🙏\n\nenvoye en cours📫')
-										check = find_ydl_url(receive_postback[1])
-										filesize = check["filesize"]
-										if filesize < 25690112:
-											audio_path = download_audio(receive_postback[1])
-											upload_audio_filedata(recipient_id, audio_path['output'])
-											send_message(recipient_id, 'Profiter bien')
-										else:
-											ytb_id = receive_postback[1]
-											send_message(recipient_id,
-														 "Votre video ne pourra pas être diffuser sur messenger."
-														 "Il sera donc diffusser sur notre page en tant que video\n\n"
-														 "Un lien sera envoyre sous peu, veuillez patientez svp ⏭⏭")
-											page_video(ytb_id[32:], recipient_id)
-								yourThread = threading.Timer(POOL_TIME, timeout(), ())
-								yourThread.start()
-								request_check['previous'] = request_check['recent']
-								request_check['recent'] = ''
-								print('=============================== verify ==============================')
-								print(request_check)
-								print('=============================== verify ==============================')
-								return 'start'
-							except Exception:
-								send_message(recipient_id, 'Désolé, Une Erreur est survenue😪😪\n\nVeuillez Réssayer après 10 mn⏭️')
-						elif receive_postback[0] == "viewvideo":
-							response_query = ' '.join(map(str, receive_postback[1:]))
-							type_query = 'video'
-							request_check['recent'] = response_query + type_query + recipient_id
-							try:
-								with dataLock:
-									print('======================================request check=====================================')
-									print(request_check)
-									print('======================================request check=====================================')
-									if (request_check['previous'] != request_check['recent']):
-										send_message(recipient_id, 'Please, veuillez patientez🙏🙏\n\nenvoye en cours📫')
-										#messenger.handle(request.get_json(force=True))
-										check = find_ydl_url(receive_postback[1])
-										filesize = check["filesize"]
-										if filesize < 25690112:
-											attacheID = upload_video_fb(recipient_id, check['url'])
-											print(attacheID)
-											upload_video_attachements(recipient_id, attacheID)
-											send_message(recipient_id, 'Profiter bien')
-										else:
-											ytb_id = receive_postback[1]
-											send_message(recipient_id,"Votre video ne pourra pas être diffuser sur messenger."
-																	  "Il sera donc diffusser sur notre page en tant que video\n\n"
-																	  "Un lien sera envoyre sous peu, veuillez patientez svp ⏭⏭")
-											page_video(ytb_id[32:], recipient_id)
-								yourThread = threading.Timer(POOL_TIME, timeout(), ())
-								yourThread.start()
-								request_check['previous'] = request_check['recent']
-								request_check['recent'] = ''
-								print('=============================== verify ==============================')
-								print(request_check)
-								print('=============================== verify ==============================')
-								return 'start'
-							except Exception:
-								send_message(recipient_id,'Désolé, Une Erreur est survenue😪😪\n\nEssayer une autre video⏭️')
-						if receive_postback[0] == "nodevideo":
-							response_query = ' '.join(map(str, receive_postback[1:]))
-							type_query = 'video'
-							request_check['recent'] = response_query + type_query + recipient_id
-							try:
-								with dataLock:
-									print('======================================request check=====================================')
-									print(request_check)
-									print('======================================request check=====================================')
-									if (request_check['previous'] != request_check['recent']):
-										send_message(recipient_id, 'Please, veuillez patientez🙏🙏\n\nenvoye en cours📫')
-										#messenger.handle(request.get_json(force=True))
-										check = find_ydl_url(receive_postback[1])
-										filesize = check["filesize"]
-										ytb_id = receive_postback[1]
-										if filesize < 25690112:
-											message_video(ytb_id[32:], recipient_id)
-											send_message(recipient_id, 'Veuillez patientez svp ...')
-										else:
-											send_message(recipient_id,"Votre video ne pourra pas être diffuser sur messenger."
-																	  "Il sera donc diffusser sur notre page en tant que video\n\n"
-																	  "Un lien sera envoyre sous peu, veuillez patientez svp ⏭⏭")
-											page_video(ytb_id[32:], recipient_id)
-								yourThread = threading.Timer(POOL_TIME, timeout(), ())
-								yourThread.start()
-								request_check['previous'] = request_check['recent']
-								request_check['recent'] = ''
-								print('=============================== verify ==============================')
-								print(request_check)
-								print('=============================== verify ==============================')
-								return 'start'
-							except Exception:
-								send_message(recipient_id,'Désolé, Une Erreur est survenue😪😪\n\nEssayer une autre video⏭️')
+									print('=============================== verify ==============================')
+									return 'start'
+								except Exception:
+									send_message(recipient_id, 'Désolé, Une Erreur est survenue😪😪\n\nVeuillez Réssayer après 10 mn⏭️')
+							else:
+								send_message(recipient_id, 'Veuillez acheter un forfait : 500Ar pour 30 jours')		
+						#Envoie template generique Video / Audio
 						elif receive_postback[0] == "Down_youtube":
+							forfait_left = request.get("https://botuserauth.herokuapp.com/api/forfait/"+recipient_id)
+							print('Forfait restant', forfait_left)
 							if len(receive_postback) < 2:
 								send_message(recipient_id, 'Erreur veuillez recommencer')
-							else:
+							elif(forfait_left > 0):
 								response_query = ' '.join(map(str, receive_postback[1:]))
 								send_generic_template_download_youtube(recipient_id, response_query)
+							elif(forfait_left <= 0):
+								send_message(recipient_id, 'Veuillez acheter un forfait : 500Ar pour 30 jours')
+						#Download audio if < 25mb else video
 						elif receive_postback[0] == "audio_download":
 							if len(receive_postback) < 2:
 								send_message(recipient_id, 'Erreur veuillez recommencer')
@@ -331,11 +269,7 @@ def receive_message():
 												send_message(recipient_id, 'Profiter bien')
 											else:
 												ytb_id = receive_postback[1]
-												send_message(recipient_id,
-															 "Votre video ne pourra pas être diffuser sur messenger."
-															 "Il sera donc diffusser sur notre page en tant que video\n\n"
-															 "Un lien sera envoyre sous peu, veuillez patientez svp ⏭⏭")
-												page_video(ytb_id[32:], recipient_id)
+												message_video(ytb_id[32:], recipient_id)
 									yourThread = threading.Timer(POOL_TIME, timeout(), ())
 									yourThread.start()
 									request_check['previous'] = request_check['recent']
@@ -350,43 +284,8 @@ def receive_message():
 							if len(receive_postback) < 2:
 								send_message(recipient_id, 'Erreur veuillez recommencer')
 							else:
-								response_query = ' '.join(map(str, receive_postback[1:]))
-								type_query = 'down_video'
-								request_check['recent'] = response_query + type_query + recipient_id
-								try:
-									with dataLock:
-										print('======================================request check=====================================')
-										print(request_check)
-										print('======================================request check=====================================')
-										print("Eto zao ligne 319")
-										if (request_check['previous'] != request_check['recent']):
-											send_message(recipient_id, 'Please, veuillez patientez🙏🙏\n\nTélechargement en cours📫')
-											check = find_ydl_url(receive_postback[1])
-											filesize = check["filesize"]
-											print("ETo zao filesize")
-											if filesize < 25690112:
-												print("eto filesize ok")
-												audio_path = download_video(receive_postback[1])
-												print(audio_path)
-												upload_vid_filedata(recipient_id, audio_path)
-												send_message(recipient_id, 'Profiter bien')
-											else:
-												ytb_id = receive_postback[1]
-												send_message(recipient_id,
-															 "Votre video ne pourra pas être diffuser sur messenger."
-															 "Il sera donc diffusser sur notre page en tant que video\n\n"
-															 "Un lien sera envoyre sous peu, veuillez patientez svp ⏭⏭")
-												page_video(ytb_id[32:], recipient_id)
-									yourThread = threading.Timer(POOL_TIME, timeout(), ())
-									yourThread.start()
-									request_check['previous'] = request_check['recent']
-									request_check['recent'] = ''
-									print('=============================== verify ==============================')
-									print(request_check)
-									print('=============================== verify ==============================')
-								except Exception:
-									print("Tsy mety")
-									send_message(recipient_id, 'Désolé, Une Erreur est survenue😪😪\n\nVeuillez Réssayer après 10 mn⏭️')
+								ytb_id = receive_postback[1]
+								message_video(ytb_id[32:], recipient_id)
 	return 'success'
 
 
@@ -416,98 +315,90 @@ def send_message(recipient_id, response):
 	return "success"
 
 
-def upload_video_fb(recipient_id, video_url):
-	payload ={
-	"recipient":{
-	  "id":recipient_id
-	},
-	"message":{
-	"attachment":{
-	  "type":"video",
-		"payload":{
-			"url": video_url,
-			"is_reusable":"True"
-		}
-		}
-	}}
-	reponse = requests.post("https://graph.facebook.com/v9.0/me/messages",
-	params={"access_token": ACCESS_TOKEN},
-	headers = {"Content-Type": "application/json"},
-	json=payload)
-	response = json.loads(reponse.text)
-	return response
+# def upload_video_fb(recipient_id, video_url):
+# 	payload ={
+# 	"recipient":{
+# 	  "id":recipient_id
+# 	},
+# 	"message":{
+# 	"attachment":{
+# 	  "type":"video",
+# 		"payload":{
+# 			"url": video_url,
+# 			"is_reusable":"True"
+# 		}
+# 		}
+# 	}}
+# 	reponse = requests.post("https://graph.facebook.com/v9.0/me/messages",
+# 	params={"access_token": ACCESS_TOKEN},
+# 	headers = {"Content-Type": "application/json"},
+# 	json=payload)
+# 	response = json.loads(reponse.text)
+# 	return response
 
 
-def upload_audio_fb(recipient_id, audio_url):
-	payload ={ 
-	"recipient":{
-	  "id":recipient_id
-	},
-	"message":{
-	"attachment":{
-	  "type":"audio", 
-		"payload":{
-			"url": audio_url,
-			"is_reusable":"True"
-		}
-		}
-	}}
-	reponse = requests.post("https://graph.facebook.com/v9.0/me/message_attachments",
-	params={"access_token": ACCESS_TOKEN},
-	headers = {"Content-Type": "application/json"},
-	json=payload)
-	rep = json.loads(reponse.text)
-	upload_audio_attachements(recipient_id, rep.get('attachment_id'))
-	return 'ok', 200#rep.get('attachment_id')
+# def upload_audio_fb(recipient_id, audio_url):
+# 	payload ={ 
+# 	"recipient":{
+# 	  "id":recipient_id
+# 	},
+# 	"message":{
+# 	"attachment":{
+# 	  "type":"audio", 
+# 		"payload":{
+# 			"url": audio_url,
+# 			"is_reusable":"True"
+# 		}
+# 		}
+# 	}}
+# 	reponse = requests.post("https://graph.facebook.com/v9.0/me/message_attachments",
+# 	params={"access_token": ACCESS_TOKEN},
+# 	headers = {"Content-Type": "application/json"},
+# 	json=payload)
+# 	rep = json.loads(reponse.text)
+# 	upload_audio_attachements(recipient_id, rep.get('attachment_id'))
+# 	return 'ok', 200#rep.get('attachment_id')
 
-#    #upload_audio_attachements(recipient_id, videme.Response()['message'].get('attachment_id'))
-# def send_message_video(recipien_id, response):
-#     bot.send_video(recipien_id, response)
-#     return "success"
 def use_voucher(tel, recipient_id):
 	response = requests.get("https://botuserauth.herokuapp.com/api/subscribe/"+tel+"/"+recipient_id)
 	return response.text
 
-def page_video(ytbId, recipient_id):
-	requests.get("https://nodemess2.herokuapp.com/"+ytbId+"/"+recipient_id+"/1")
-	return 'ok', 200
-
 def message_video(ytbId, recipient_id):
-	requests.get("https://nodemess2.herokuapp.com/"+ytbId+"/"+recipient_id+"/2")
+	requests.get("https://nodemess2.herokuapp.com/"+ytbId+"/"+recipient_id)
 	return 'ok', 200
 
 
-def upload_audio_attachements(recipient_id, attachment_id):
-	payload = {
-	"recipient":{
-	  "id":recipient_id
-	},
-	"message":{
-	"attachment":{
-	  "type":"audio", 
-	  "payload":{"attachment_id": attachment_id}
-		}
-	}}
-	reponse = requests.post("https://graph.facebook.com/v9.0/me/messages",
-	params={"access_token": ACCESS_TOKEN},
-	headers = {"Content-Type": "application/json"},
-	json=payload)
+# def upload_audio_attachements(recipient_id, attachment_id):
+# 	payload = {
+# 	"recipient":{
+# 	  "id":recipient_id
+# 	},
+# 	"message":{
+# 	"attachment":{
+# 	  "type":"audio", 
+# 	  "payload":{"attachment_id": attachment_id}
+# 		}
+# 	}}
+# 	reponse = requests.post("https://graph.facebook.com/v9.0/me/messages",
+# 	params={"access_token": ACCESS_TOKEN},
+# 	headers = {"Content-Type": "application/json"},
+# 	json=payload)
 
-def upload_video_attachements(recipient_id, attachment_id):
-	payload = {
-	"recipient":{
-	  "id":recipient_id
-	},
-	"message":{
-	"attachment":{
-	  "type":"video", 
-	  "payload":{"attachment_id": attachment_id}
-		}
-	}}
-	reponse = requests.post("https://graph.facebook.com/v9.0/me/messages",
-	params={"access_token": ACCESS_TOKEN},
-	headers = {"Content-Type": "application/json"},
-	json=payload)
+# def upload_video_attachements(recipient_id, attachment_id):
+# 	payload = {
+# 	"recipient":{
+# 	  "id":recipient_id
+# 	},
+# 	"message":{
+# 	"attachment":{
+# 	  "type":"video", 
+# 	  "payload":{"attachment_id": attachment_id}
+# 		}
+# 	}}
+# 	reponse = requests.post("https://graph.facebook.com/v9.0/me/messages",
+# 	params={"access_token": ACCESS_TOKEN},
+# 	headers = {"Content-Type": "application/json"},
+# 	json=payload)
 
 def upload_audio_filedata(recipient_id,path):
 	params = {
@@ -596,71 +487,71 @@ def upload_img_filedata(recipient_id, path):
 	r = requests.post("https://graph.facebook.com/v9.0/me/messages", params=params, headers=multipart_header,
 					  data=multipart_data)
 
-def upload_vid_filedata(recipient_id, path):
-	params = {
-		"access_token": ACCESS_TOKEN
-	}
-	data = {
-		# encode nested json to avoid errors during multipart encoding process
-		'recipient': json.dumps({
-			'id': recipient_id
-		}),
-		# encode nested json to avoid errors during multipart encoding process
-		'message': json.dumps({
-			'attachment': {
-				'type': 'video',
-				'payload': {}
-			}
-		}),
-		'filedata': (os.path.basename(path), open(path, 'rb'), 'video/mp4')
-	}
+# def upload_vid_filedata(recipient_id, path):
+# 	params = {
+# 		"access_token": ACCESS_TOKEN
+# 	}
+# 	data = {
+# 		# encode nested json to avoid errors during multipart encoding process
+# 		'recipient': json.dumps({
+# 			'id': recipient_id
+# 		}),
+# 		# encode nested json to avoid errors during multipart encoding process
+# 		'message': json.dumps({
+# 			'attachment': {
+# 				'type': 'video',
+# 				'payload': {}
+# 			}
+# 		}),
+# 		'filedata': (os.path.basename(path), open(path, 'rb'), 'video/mp4')
+# 	}
 
-	# multipart encode the entire payload
-	multipart_data = MultipartEncoder(data)
+# 	# multipart encode the entire payload
+# 	multipart_data = MultipartEncoder(data)
 
-	# multipart header from multipart_data
-	multipart_header = {
-		'Content-Type': multipart_data.content_type
-	}
+# 	# multipart header from multipart_data
+# 	multipart_header = {
+# 		'Content-Type': multipart_data.content_type
+# 	}
 
-	r = requests.post("https://graph.facebook.com/v9.0/me/messages", params=params, headers=multipart_header,
-					  data=multipart_data)
+# 	r = requests.post("https://graph.facebook.com/v9.0/me/messages", params=params, headers=multipart_header,
+# 					  data=multipart_data)
 
 #For reboot/rebuild fbtoken, recipient_id, pageId, RepoName, appName, herokutoken
-def rebuildSys(recipient_id):
-	payload = {
-	"fb":{
-	  "userId":recipient_id,
-	  "pageId":pageId,
-	  "fbtoken":ACCESS_TOKEN
-	},
-	"heroku":{
-		"repo":RepoName,
-		"appName":appName,#botmessengerjao
-		"herokutoken": herokutoken
-	}}
-	reponse = requests.post("https://rebootsystem.herokuapp.com/builds",
-	headers = {"Content-Type": "application/json"},
-	json=payload)
-	reponse.close()
-	return "success"
+# def rebuildSys(recipient_id):
+# 	payload = {
+# 	"fb":{
+# 	  "userId":recipient_id,
+# 	  "pageId":pageId,
+# 	  "fbtoken":ACCESS_TOKEN
+# 	},
+# 	"heroku":{
+# 		"repo":RepoName,
+# 		"appName":appName,#botmessengerjao
+# 		"herokutoken": herokutoken
+# 	}}
+# 	reponse = requests.post("https://rebootsystem.herokuapp.com/builds",
+# 	headers = {"Content-Type": "application/json"},
+# 	json=payload)
+# 	reponse.close()
+# 	return "success"
 
-def rebootSys(recipient_id):
-	payload = {
-	"fb":{
-	  "userId":recipient_id,
-	  "pageId":pageId,
-	  "fbtoken":ACCESS_TOKEN
-	},
-	"heroku":{
-		"appName":appName,
-		"herokutoken": herokutoken
-	}}
-	reponse = requests.post("https://rebootsystem.herokuapp.com/reboot",
-	headers = {"Content-Type": "application/json"},
-	json=payload)
-	reponse.close()
-	return "success"
+# def rebootSys(recipient_id):
+# 	payload = {
+# 	"fb":{
+# 	  "userId":recipient_id,
+# 	  "pageId":pageId,
+# 	  "fbtoken":ACCESS_TOKEN
+# 	},
+# 	"heroku":{
+# 		"appName":appName,
+# 		"herokutoken": herokutoken
+# 	}}
+# 	reponse = requests.post("https://rebootsystem.herokuapp.com/reboot",
+# 	headers = {"Content-Type": "application/json"},
+# 	json=payload)
+# 	reponse.close()
+# 	return "success"
 
 
 
@@ -814,9 +705,9 @@ def send_generic_template_download_youtube(recipient_id, link):
 	postback_data = request.get_json()
 	return "success"
 
-def send_BM(recipient_id, response_sent_text, element):
-	bot.send_button_message(recipient_id, response_sent_text, element)
-	return "success"
+# def send_BM(recipient_id, response_sent_text, element):
+# 	bot.send_button_message(recipient_id, response_sent_text, element)
+# 	return "success"
 
 
 
