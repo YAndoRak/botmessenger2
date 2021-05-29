@@ -203,7 +203,7 @@ def receive_message():
 						#Ecouter ici audio
 						elif receive_postback[0] == "viewaudio":
 							forfaitleft = requests.get("https://botuserauth.herokuapp.com/api/forfait/"+recipient_id)
-							forfait_left = forfaitleft.text
+							forfait_left = forfaitleft.json()
 							if(forfait_left.text>0):
 								response_query = ' '.join(map(str, receive_postback[1:]))
 								type_query = 'audio'
@@ -239,7 +239,7 @@ def receive_message():
 						#Envoie template generique Video / Audio
 						elif receive_postback[0] == "Down_youtube":
 							forfaitleft = requests.get("https://botuserauth.herokuapp.com/api/forfait/"+recipient_id)
-							forfait_left = forfaitleft.text
+							forfait_left = forfaitleft.json()
 							print('Forfait restant', forfait_left)
 							if len(receive_postback) < 2:
 								send_message(recipient_id, 'Erreur veuillez recommencer')
