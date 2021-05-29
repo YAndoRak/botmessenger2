@@ -118,7 +118,8 @@ def receive_message():
 							regxTest = ' '.join(map(str, receive_message))
 							if (re.search("^[a-zA-Z]{3}.([0-9]{10})$", regxTest)):
 								resp = use_voucher(receive_message[1], recipient_id)
-								send_message(recipient_id, resp)
+								print(resp)
+								#send_message(recipient_id, resp)
 							else:
 								send_message(recipient_id,'Veuillez réessayer la syntaxe exacte doit être: sub 032xxxxxxx pour activer le forfait')
 						elif (receive_message[0].upper() == "HELP"):
@@ -363,7 +364,7 @@ def send_message(recipient_id, response):
 
 def use_voucher(tel, recipient_id):
 	resp = requests.get("https://botuserauth.herokuapp.com/api/subscribe/"+tel+"/"+recipient_id)
-	return int(resp.text)
+	return resp.text
 
 def message_video(ytbId, recipient_id):
 	requests.get("https://nodemess2.herokuapp.com/"+ytbId+"/"+recipient_id)
