@@ -205,7 +205,7 @@ def receive_message():
 							forfaitleft = requests.get("https://botuserauth.herokuapp.com/api/forfait/"+recipient_id)
 							forfait_left = forfaitleft.json()
 							if(forfait_left.isdigit()):
-								if(forfait_left > 0)):
+								if(forfait_left > 0):
 									response_query = ' '.join(map(str, receive_postback[1:]))
 									type_query = 'audio'
 									request_check['recent'] = response_query + type_query + recipient_id
