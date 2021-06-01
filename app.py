@@ -204,38 +204,39 @@ def receive_message():
 						elif receive_postback[0] == "viewaudio":
 							forfaitleft = requests.get("https://botuserauth.herokuapp.com/api/forfait/"+recipient_id)
 							forfait_left = forfaitleft.json()
-							if(forfait_left.text>0):
-								response_query = ' '.join(map(str, receive_postback[1:]))
-								type_query = 'audio'
-								request_check['recent'] = response_query + type_query + recipient_id
-								try:
-									with dataLock:
-										print('======================================request check=====================================')
+							if(forfait_left.isdigit()):
+								if(forfait_left > 0)):
+									response_query = ' '.join(map(str, receive_postback[1:]))
+									type_query = 'audio'
+									request_check['recent'] = response_query + type_query + recipient_id
+									try:
+										with dataLock:
+											print('======================================request check=====================================')
+											print(request_check)
+											print('======================================request check=====================================')
+											if (request_check['previous'] != request_check['recent']):
+												send_message(recipient_id, 'Please, veuillez patientez🙏🙏\n\nenvoye en cours📫')
+												check = find_ydl_url(receive_postback[1])
+												filesize = check["filesize"]
+												if filesize < 25690112:
+													audio_path = download_audio(receive_postback[1])
+													upload_audio_filedata(recipient_id, audio_path['output'])
+													send_message(recipient_id, 'Profiter bien')
+												else:
+													ytb_id = receive_postback[1]
+													message_video(ytb_id[32:], recipient_id)
+										yourThread = threading.Timer(POOL_TIME, timeout(), ())
+										yourThread.start()
+										request_check['previous'] = request_check['recent']
+										request_check['recent'] = ''
+										print('=============================== verify ==============================')
 										print(request_check)
-										print('======================================request check=====================================')
-										if (request_check['previous'] != request_check['recent']):
-											send_message(recipient_id, 'Please, veuillez patientez🙏🙏\n\nenvoye en cours📫')
-											check = find_ydl_url(receive_postback[1])
-											filesize = check["filesize"]
-											if filesize < 25690112:
-												audio_path = download_audio(receive_postback[1])
-												upload_audio_filedata(recipient_id, audio_path['output'])
-												send_message(recipient_id, 'Profiter bien')
-											else:
-												ytb_id = receive_postback[1]
-												message_video(ytb_id[32:], recipient_id)
-									yourThread = threading.Timer(POOL_TIME, timeout(), ())
-									yourThread.start()
-									request_check['previous'] = request_check['recent']
-									request_check['recent'] = ''
-									print('=============================== verify ==============================')
-									print(request_check)
-									print('=============================== verify ==============================')
-									return 'start'
-								except Exception:
-									send_message(recipient_id, 'Désolé, Une Erreur est survenue😪😪\n\nVeuillez Réssayer après 10 mn⏭️')
-							else:
-								send_message(recipient_id, 'Veuillez acheter un forfait : 500Ar pour 30 jours')		
+										print('=============================== verify ==============================')
+										return 'start'
+									except Exception:
+										send_message(recipient_id, 'Désolé, Une Erreur est survenue😪😪\n\nVeuillez Réssayer après 10 mn⏭️')
+								else:
+									send_message(recipient_id, 'Veuillez acheter un forfait : 500Ar pour 30 jours')		
 						#Envoie template generique Video / Audio
 						elif receive_postback[0] == "Down_youtube":
 							forfaitleft = requests.get("https://botuserauth.herokuapp.com/api/forfait/"+recipient_id)
