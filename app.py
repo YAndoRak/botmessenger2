@@ -204,7 +204,7 @@ def receive_message():
 						elif receive_postback[0] == "viewaudio":
 							forfaitleft = requests.get("https://botuserauth.herokuapp.com/api/forfait/"+recipient_id)
 							forfait_left = forfaitleft.json()
-							if(Number.isInteger(forfait_left)):
+							if(isinstance(forfait_left, int) and not isinstance(forfait_left, str)):
 								if(forfait_left > 0):
 									response_query = ' '.join(map(str, receive_postback[1:]))
 									type_query = 'audio'
@@ -244,7 +244,7 @@ def receive_message():
 							print('Forfait restant', forfait_left)
 							if len(receive_postback) < 2:
 								send_message(recipient_id, 'Erreur veuillez recommencer')
-							if (Number.isInteger(forfait_left)):
+							if (isinstance(forfait_left, int) and not isinstance(forfait_left, str)):
 								if(forfait_left > 0):
 									response_query = ' '.join(map(str, receive_postback[1:]))
 									send_generic_template_download_youtube(recipient_id, response_query)
